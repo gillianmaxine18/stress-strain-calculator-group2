@@ -2,6 +2,7 @@
 # Part 2: Stress and Strain Calculator with Control Structures
 # TODO: Complete this template by filling in the missing code
 
+
 def main():
     """Main function for Task 2: Control Structures & Safety Analysis."""
     
