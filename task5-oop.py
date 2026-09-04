@@ -30,3 +30,24 @@ class Material:
 
     def can_withstand_stress(self, stress: float) -> bool:
         return stress < self.properties.yield_strength
+
+class Metal(Material):
+    def __init__(self, name: str, properties: MaterialProperties, is_ferrous: bool = False):
+        super().__init__(name, properties)
+        self.is_ferrous = is_ferrous
+
+    def __str__(self) -> str:
+        ferrous_text = "Ferrous" if self.is_ferrous else "Non-ferrous"
+        return f"{self.name} ({ferrous_text} metal, Density: {self.properties.density} kg/m³)"
+
+class Plastic(Material): pass
+class Ceramic(Material): pass
+
+# database integration
+def get_predefined_materials() -> dict:
+    return {
+        "1": Metal("Structural Steel", MaterialProperties(7850, 250, 200), is_ferrous=True),
+        "2": Metal("6061-T6 Aluminum", MaterialProperties(2700, 270, 68.9), is_ferrous=False),
+        "3": Plastic("PVC Plastic", MaterialProperties(1380, 45, 3)),
+        "4": Ceramic("Standard Concrete", MaterialProperties(2400, 30, 30))
+    }
