@@ -1,7 +1,7 @@
 # material.py
 from dataclasses import dataclass
 from typing import Optional
-from properties import MaterialProperties
+from .properties import MaterialProperties
 
 class Material:
     """Base class for all materials."""
