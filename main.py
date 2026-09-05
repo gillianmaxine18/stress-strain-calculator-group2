@@ -749,7 +749,7 @@ class TestAnalysisSystem:
             print(f"\nTest {i}")
             print("-" * 30)
             print(f"Material: {test.material.name}")
-            print(f"Force: {test.force:.2f} {UNITS[0]}")
+            print(f"Force: {test.applied_force:.2f} {UNITS[0]}")
             print(f"Area: {test.area:.6f} {UNITS[1]}")
             print(f"Stress: {test.stress:.2e} {UNITS[4]}")
             print(f"Strain: {test.strain:.4f}")
