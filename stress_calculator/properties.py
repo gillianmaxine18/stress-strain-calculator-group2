@@ -4,7 +4,6 @@ properties.py - Material properties data class & interactive session manager.
 
 from dataclasses import dataclass
 import sys
-from .database import load_materials, export_test_results_to_csv
 
 
 # 1. CLASS DEFINITION FOR MATERIAL PROPERTIES
@@ -18,6 +17,8 @@ class MaterialProperties:
 # 2. INTERACTIVE SESSION MANAGER (TASK 3)
 def main():
     """Main session manager function for Task 3."""
+    # Lazy imports placed inside main to prevent circular import loops
+    from .database import load_materials, export_test_results_to_csv
 
     print("=== Stress and Strain Calculator - Session Manager ===")
     print()
@@ -109,7 +110,7 @@ def main():
 
     # Task 3: Session Summary Output
     print("\n" + "=" * 45)
-    print("              SESSION SUMMARY")
+    print("               SESSION SUMMARY")
     print("=" * 45)
     print(f"Total calculations performed : {len(calculation_history)}")
     print(f"Unique materials tested      : {len(materials_used)}")
