@@ -42,7 +42,7 @@ class StressStrainTest:
         if self.strain == 0:
             return 0
         raw_modulus = utils.calculate_youngs_modulus(self.stress, self.strain)
-        return raw_modulus / 1000
+        return raw_modulus / 1e9
 
     def will_fail(self) -> bool:
         return not self.material.can_withstand_stress(self.stress)
