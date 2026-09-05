@@ -1,9 +1,9 @@
-import math
-from typing import Callable, Any
+"""
+utils.py - Stress and Strain Calculation and Validation Utilities
+Part of Task 6 Modular Package Integration
+"""
 
-# CONSTANTS
-# Standard measurement units tuple: (Force, Area, Length, Delta L, Stress)
-UNITS: tuple[str, ...] = ("N", "m²", "m", "m", "Pa")
+import math
 
 # 1. CORE CALCULATION UTILITIES
 def calculate_stress(force: float, area: float) -> float:
@@ -67,34 +67,7 @@ def validate_input(force: float, area: float, original_length: float, change_in_
 
     return True
 
-def get_valid_number(prompt: str, min_value: float = 0.0, allow_zero: bool = False) -> float:
-    """Prompt user for numeric input until a valid number is supplied."""
-    while True:
-        raw_val = input(prompt).strip()
-        try:
-            num = float(raw_val)
-            if allow_zero and num == 0.0:
-                return num
-            if num <= min_value and not allow_zero:
-                print(f"  [Input Error] Value must be greater than {min_value}.")
-                continue
-            if num < min_value and allow_zero:
-                print(f"  [Input Error] Value cannot be less than {min_value}.")
-                continue
-            return num
-        except ValueError:
-            print("  [Input Error] Invalid input. Please enter a valid number.")
 
-def get_validated_input(prompt: str, validator_func: Callable[[float, str], float], param_name: str) -> float:
-    """Prompt user repeatedly until input satisfying validator_func is provided."""
-    while True:
-        raw_val = input(prompt).strip()
-        try:
-            num = float(raw_val)
-            return validator_func(num, param_name)
-        except (ValueError, TypeError) as err:
-            print(f"  [Input Error] {err}")
-            
 # 3. CONVERSION UTILITIES
 def pascals_to_megapascals(pa: float) -> float:
     """Convert Pascals (Pa) to MegaPascals (MPa)."""
