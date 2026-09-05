@@ -1,11 +1,11 @@
 """main.py"""
 import sys
 try:
-    from properties import MaterialProperties
-    from material import Material
-    from tests import StressStrainTest, TestAnalysisSystem
-    import database
-    import utils
+    from stress_calculator.properties import MaterialProperties
+    from stress_calculator.material import Material
+    from stress_calculator.tests import StressStrainTest, TestAnalysisSystem
+    from stress_calculator import database
+    from stress_calculator import utils
 except ImportError as e:
     print(f"CRITICAL ERROR: Missing module - {e}")
     sys.exit(1)
@@ -63,7 +63,7 @@ def main():
     analyzer.display_session_summary()
     
     # New CSV Export feature
-    if analyzer.tests:
+    if analyzer.tests and hasattr(analyzer, "get_export_data"):
         database.export_test_results_to_csv(analyzer.get_export_data())
         
     print("\nThank you for using the Stress and Strain Calculator! Goodbye!")
