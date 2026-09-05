@@ -1,6 +1,7 @@
-from typing import List
-from material import Material
-import utils
+from .material import Material, Metal, Plastic, Composite
+from .properties import MaterialProperties
+from .database import get_predefined_materials
+from .utils import calculate_stress, calculate_strain
 
 UNITS = ("N", "m²", "m", "m", "Pa")
 
