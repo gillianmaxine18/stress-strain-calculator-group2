@@ -46,14 +46,12 @@ class StressStrainTest:
 
     def will_fail(self) -> bool:
         return not self.material.can_withstand_stress(self.stress)
-
+    
     @property
     def factor_of_safety(self) -> float:
         if self.stress <= 0:
             return float("inf")
-        return utils.calculate_factor_of_safety(
-            self.material.properties.yield_strength, self.stress
-        )
+        return utils.calculate_factor_of_safety(self.material.properties.yield_strength * 1_000_000, self.stress)
 
     @property
     def safety_result(self) -> str:
