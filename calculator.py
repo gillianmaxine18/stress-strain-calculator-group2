@@ -1,4 +1,70 @@
+# Part 1: Basic Stress and Strain Calculator Template
+# TODO: Complete this template by filling in the missing code
 
+
+def main():
+    """Main function for the stress and strain calculator."""
+
+    # TODO: Print a header for your program
+    print("=== Stress and Strain Calculator ===")
+    print()
+
+    # TODO: Get user input for the four required values
+    # Hint: Use input() to get strings, then convert with float()
+    force = float(input("Enter applied force (N): ")) # TODO: Get applied force from user
+    area = float(input("Enter cross-sectional area (m²): ")) # TODO: Get cross-sectional area from user
+    original_length = float(input("Enter original length (m): ")) # TODO: Get original length from user
+    change_in_length = float(input("Enter change in length (m): ")) # TODO: Get change in length from user
+
+    # TODO: Calculate stress and strain
+    # Hint: Stress = Force / Area, Strain = Change in Length / Original Length
+    stress = force / area # TODO: Calculate stress
+    strain = change_in_length / original_length # TODO: Calculate strain
+
+
+    # TODO: Display the input values using f-string formatting
+    print()
+    print("=== INPUT VALUES ===")
+
+    # TODO: Print each input value with appropriate formatting
+    # Hint: Use {variable:.2f} for 2 decimal places
+    print(f"Force: {force:.2f} N")
+    print(f"Area: {area:.4f} m²")
+    print(f"Original Length: {original_length:.2f} m")
+    print(f"Change in Length: {change_in_length:.4f} m")
+
+    print()
+    print("=== RESULTS ===")
+
+    # TODO: Display the calculated results
+    # TODO: Print stress with 2 decimal places and units (Pa)
+    print(f"Stress: {stress:.2f} Pa")
+
+    # TODO: Print strain with 6 decimal places (no units - it's dimensionless)
+    print(f"Strain: {strain:.6f}")
+
+    print()
+
+    # BONUS TODO: Convert stress to MPa (divide by 1,000,000)
+    stress_mpa = stress / 1_000_000
+    print(f"Stress in MPa: {stress_mpa:.2f} MPa")
+
+    # BONUS TODO: Determine if loading is tension or compression
+    if change_in_length > 0:
+        print("Loading Type: Tension")
+    elif change_in_length < 0:
+        print("Loading Type: Compression")
+    else:
+        print("Loading Type: Neutral")
+
+    print()
+    print("=== Analysis Complete ===")
+
+
+
+if __name__ == "__main__":
+    main()
+    
 # Part 2: Stress and Strain Calculator with Control Structures
 # TODO: Complete this template by filling in the missing code
 
