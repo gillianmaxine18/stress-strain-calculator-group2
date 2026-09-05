@@ -1,72 +1,69 @@
-"""main.py"""
-import sys
-try:
-    from stress_calculator.properties import MaterialProperties
-    from stress_calculator.material import Material
-    from stress_calculator.tests import StressStrainTest, TestAnalysisSystem
-    from stress_calculator import database
-    from stress_calculator import utils
-except ImportError as e:
-    print(f"CRITICAL ERROR: Missing module - {e}")
-    sys.exit(1)
+# database.py
 
-def main():
-    analyzer = TestAnalysisSystem()
-    # Load materials from JSON DB instead of standard dict
-    materials_db = database.load_materials()
+"""
+database.py - Predefined Materials & File Export Management
+Part of Task 6 Package Integration
+"""
 
-    while True:
-        print("\n" + "=" * 45)
-        print("       STRESS AND STRAIN CALCULATOR")
-        print("=" * 45)
+import json
+import csv
+from pathlib import Path
+from datetime import datetime
+from .properties import MaterialProperties
+from .material import Material, Metal, Plastic, Composite
 
-        force = utils.get_valid_number(f"Enter the applied force in {utils.UNITS[0]}: ")
-        area = utils.get_valid_number(f"Enter the cross-sectional area in {utils.UNITS[1]}: ")
-        length = utils.get_valid_number(f"Enter the original length in {utils.UNITS[2]}: ")
-        change = utils.get_valid_number(f"Enter the change in length in {utils.UNITS[3]}: ")
+BASE_DIR = Path(__file__).resolve().parent
+JSON_PATH = BASE_DIR / "materials_db.json"
+CSV_PATH = BASE_DIR / "test_results.csv"
 
-        print("\nSelect Material for Safety Analysis:")
-        for key, mat in materials_db.items():
-            print(f"[{key}] {mat.name}")
-        print("[5] Custom Material")
+def get_predefined_materials() -> dict:
+    """Default fallback materials."""
+    return {
+        "1": Metal("Structural Steel", MaterialProperties(7850, 250, 200), is_ferrous=True),
+        "2": Metal("Aluminum 6061", MaterialProperties(2700, 276, 68.9), is_ferrous=False),
+        "3": Plastic("ABS Plastic", MaterialProperties(1040, 40, 2.3)),
+        "4": Composite("Carbon Fiber", MaterialProperties(1600, 600, 150)),
+    }
 
-        choice = input("Enter choice (1-5): ").strip()
+def load_materials() -> dict:
+    """Loads material database (JSON fallback to default dict)."""
+    if not JSON_PATH.exists():
+        return get_predefined_materials()
 
-        if choice in materials_db:
-            selected_material = materials_db[choice]
-        elif choice == "5":
-            mat_name = input("Enter custom material name: ").strip() or "Custom Material"
-            density = utils.get_valid_number("Enter custom Density (kg/m³): ")
-            yield_strength = utils.get_valid_number("Enter custom Yield Strength (MPa): ")
-            youngs_modulus = utils.get_valid_number("Enter custom Young's Modulus (GPa): ")
-            selected_material = Material(mat_name, MaterialProperties(density, yield_strength, youngs_modulus))
-        else:
-            print("Invalid choice! Defaulting to Structural Steel.")
-            selected_material = materials_db["1"]
+    try:
+        with open(JSON_PATH, "r", encoding="utf-8") as f:
+            raw = json.load(f)
+            return {
+                k: Material(v["name"], MaterialProperties(v["density"], v["yield_strength"], v["youngs_modulus"]))
+                for k, v in raw.items()
+            }
+    except Exception:
+        return get_predefined_materials()
 
-        # Process through OOP system
-        test = StressStrainTest(selected_material, force, area, length, change)
-        analyzer.add_test(test)
+def export_test_results_to_csv(test_data: list) -> None:
+    """Exports test history to a CSV file."""
+    if not test_data:
+        return
 
-        print("\n" + "-" * 15 + " Results " + "-" * 15)
-        print(f"Calculated Stress: {test.stress:.2e} {utils.UNITS[4]}")
-        print(f"Calculated Strain: {test.strain:.4f}")
-        print(f"Factor of Safety (FoS): {test.factor_of_safety:.2f}")
-        print(f"Safety Status: {test.safety_result}")
-        print("-" * 39)
+    fieldnames = ["Timestamp", "Material", "Stress (Pa)", "Strain", "Factor of Safety", "Status"]
+    file_exists = CSV_PATH.exists()
 
-        repeat = input("\nDo you want to calculate again? (yes/no): ").lower().strip()
-        if repeat not in ["yes", "y"]:
-            break
+    try:
+        with open(CSV_PATH, "a", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            if not file_exists:
+                writer.writeheader()
 
-    # Display final summaries and export
-    analyzer.display_session_summary()
-    
-    # New CSV Export feature
-    if analyzer.tests and hasattr(analyzer, "get_export_data"):
-        database.export_test_results_to_csv(analyzer.get_export_data())
-        
-    print("\nThank you for using the Stress and Strain Calculator! Goodbye!")
-
-if __name__ == "__main__":
-    main()
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            for item in test_data:
+                writer.writerow({
+                    "Timestamp": now,
+                    "Material": item.get("material", "N/A"),
+                    "Stress (Pa)": f"{item.get('stress', 0):.2e}",
+                    "Strain": f"{item.get('strain', 0):.6f}",
+                    "Factor of Safety": f"{item.get('factor_of_safety', 0):.2f}",
+                    "Status": item.get("safety_result", "N/A")
+                })
+        print(f"\n[INFO] Results exported to {CSV_PATH.name}")
+    except Exception as e:
+        print(f"[ERROR] Export failed: {e}")
