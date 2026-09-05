@@ -1,59 +1,72 @@
-"""database.py"""
-import json
-import os
-import csv
-
+"""main.py"""
+import sys
 try:
     from properties import MaterialProperties
-    from material import Material, Metal, Plastic, Ceramic
-except ImportError:
-    print("Warning: Missing material or properties modules.")
+    from material import Material
+    from tests import StressStrainTest, TestAnalysisSystem
+    import database
+    import utils
+except ImportError as e:
+    print(f"CRITICAL ERROR: Missing module - {e}")
+    sys.exit(1)
 
-DB_FILE = "material_database.json"
+def main():
+    analyzer = TestAnalysisSystem()
+    # Load materials from JSON DB instead of standard dict
+    materials_db = database.load_materials()
 
-def create_default_database():
-    """Generates the default database based on the OOP specifications."""
-    if not os.path.exists(DB_FILE):
-        default_data = {
-            "Structural Steel": {"category": "Metal", "density": 7850, "yield_strength": 250, "youngs_modulus": 200, "is_ferrous": True},
-            "6061-T6 Aluminum": {"category": "Metal", "density": 2700, "yield_strength": 270, "youngs_modulus": 68.9, "is_ferrous": False},
-            "PVC Plastic": {"category": "Plastic", "density": 1380, "yield_strength": 45, "youngs_modulus": 3},
-            "Standard Concrete": {"category": "Ceramic", "density": 2400, "yield_strength": 30, "youngs_modulus": 30}
-        }
-        with open(DB_FILE, 'w') as file:
-            json.dump(default_data, file, indent=4)
+    while True:
+        print("\n" + "=" * 45)
+        print("       STRESS AND STRAIN CALCULATOR")
+        print("=" * 45)
 
-def load_materials() -> dict:
-    """Loads JSON data and converts them back into OOP objects."""
-    if not os.path.exists(DB_FILE):
-        create_default_database()
-        
-    with open(DB_FILE, 'r') as file:
-        data = json.load(file)
-        
-    materials_db = {}
-    for i, (name, props) in enumerate(data.items(), 1):
-        mat_props = MaterialProperties(props["density"], props["yield_strength"], props["youngs_modulus"])
-        cat = props["category"]
-        if cat == "Metal":
-            materials_db[str(i)] = Metal(name, mat_props, props.get("is_ferrous", False))
-        elif cat == "Plastic":
-            materials_db[str(i)] = Plastic(name, mat_props)
-        elif cat == "Ceramic":
-            materials_db[str(i)] = Ceramic(name, mat_props)
+        force = utils.get_valid_number(f"Enter the applied force in {utils.UNITS[0]}: ")
+        area = utils.get_valid_number(f"Enter the cross-sectional area in {utils.UNITS[1]}: ")
+        length = utils.get_valid_number(f"Enter the original length in {utils.UNITS[2]}: ")
+        change = utils.get_valid_number(f"Enter the change in length in {utils.UNITS[3]}: ")
+
+        print("\nSelect Material for Safety Analysis:")
+        for key, mat in materials_db.items():
+            print(f"[{key}] {mat.name}")
+        print("[5] Custom Material")
+
+        choice = input("Enter choice (1-5): ").strip()
+
+        if choice in materials_db:
+            selected_material = materials_db[choice]
+        elif choice == "5":
+            mat_name = input("Enter custom material name: ").strip() or "Custom Material"
+            density = utils.get_valid_number("Enter custom Density (kg/m³): ")
+            yield_strength = utils.get_valid_number("Enter custom Yield Strength (MPa): ")
+            youngs_modulus = utils.get_valid_number("Enter custom Young's Modulus (GPa): ")
+            selected_material = Material(mat_name, MaterialProperties(density, yield_strength, youngs_modulus))
         else:
-            materials_db[str(i)] = Material(name, mat_props)
-            
-    return materials_db
+            print("Invalid choice! Defaulting to Structural Steel.")
+            selected_material = materials_db["1"]
 
-def export_test_results_to_csv(tests_data, filename="test_history.csv"):
-    """Exports a list of test dictionaries to a CSV file."""
-    try:
-        with open(filename, 'w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["Timestamp", "Material", "Stress", "Strain", "FoS", "Result"])
-            for t in tests_data:
-                writer.writerow([t['timestamp'], t['material'], t['stress'], t['strain'], t['fos'], t['result']])
-        print(f"\n[Success] Test history exported to {filename}")
-    except Exception as e:
-        print(f"Error exporting to CSV: {e}")
+        # Process through OOP system
+        test = StressStrainTest(selected_material, force, area, length, change)
+        analyzer.add_test(test)
+
+        print("\n" + "-" * 15 + " Results " + "-" * 15)
+        print(f"Calculated Stress: {test.stress:.2e} {utils.UNITS[4]}")
+        print(f"Calculated Strain: {test.strain:.4f}")
+        print(f"Factor of Safety (FoS): {test.factor_of_safety:.2f}")
+        print(f"Safety Status: {test.safety_result}")
+        print("-" * 39)
+
+        repeat = input("\nDo you want to calculate again? (yes/no): ").lower().strip()
+        if repeat not in ["yes", "y"]:
+            break
+
+    # Display final summaries and export
+    analyzer.display_session_summary()
+    
+    # New CSV Export feature
+    if analyzer.tests:
+        database.export_test_results_to_csv(analyzer.get_export_data())
+        
+    print("\nThank you for using the Stress and Strain Calculator! Goodbye!")
+
+if __name__ == "__main__":
+    main()
