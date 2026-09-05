@@ -62,7 +62,7 @@ class StressStrainTest:
     def __str__(self) -> str:
         return (
             f"Test on {self.material.name}: "
-            f"Stress={self.stress:.2f} MPa, "
+            f"Stress={self.stress / 1_000_000:.2f} MPa, "
             f"Strain={self.strain:.6f}, "
             f"Young's Modulus={self.youngs_modulus:.2f} GPa"
         )
