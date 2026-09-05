@@ -29,7 +29,8 @@ class Material:
         return f"{self.name} (Density: {self.properties.density} kg/m³)"
 
     def can_withstand_stress(self, stress: float) -> bool:
-        return stress < self.properties.yield_strength
+        # Fixed: Converted MPa to Pa
+        return stress < (self.properties.yield_strength * 1_000_000)
 
 class Metal(Material):
     def __init__(self, name: str, properties: MaterialProperties, is_ferrous: bool = False):
@@ -67,6 +68,8 @@ class StressStrainTest:
             raise ValueError("Area must be positive")
         if original_length <= 0:
             raise ValueError("Original length must be positive")
+        if change_in_length == 0:
+            raise ValueError("Change in length cannot be zero")
 
     @property
     def stress(self) -> float:
@@ -80,7 +83,8 @@ class StressStrainTest:
     def youngs_modulus(self) -> float:
         if self.strain == 0:
             return 0
-        return (self.stress / self.strain) / 1000
+        # Fixed: Divided by 1e9 for GPa scaling
+        return (self.stress / self.strain) / 1e9
 
     def will_fail(self) -> bool:
         return not self.material.can_withstand_stress(self.stress)
@@ -89,7 +93,8 @@ class StressStrainTest:
     def factor_of_safety(self) -> float:
         if self.stress <= 0:
             return float('inf')
-        return self.material.properties.yield_strength / self.stress
+        # Fixed: Converted MPa to Pa
+        return (self.material.properties.yield_strength * 1_000_000) / self.stress
 
     @property
     def safety_result(self) -> str:
@@ -100,7 +105,7 @@ class StressStrainTest:
     def __str__(self) -> str:
         return (
             f"Test on {self.material.name}: "
-            f"Stress={self.stress:.2f} MPa, "
+            f"Stress={self.stress:.2f} Pa, "
             f"Strain={self.strain:.6f}, "
             f"Young's Modulus={self.youngs_modulus:.2f} GPa"
         )
@@ -142,7 +147,7 @@ class TestAnalysisSystem:
         print("\nBasic Statistics:")
         print(f"Average Stress: {sum(stresses)/len(stresses):.2e} {UNITS[4]}")
         print(f"Average Strain: {sum(strains)/len(strains):.4f}")
-        print(f"Average Young's Modulus: {sum(moduli)/len(moduli):.2e} {UNITS[4]}")
+        print(f"Average Young's Modulus: {sum(moduli)/len(moduli):.2e} GPa")
         print(f"Average Factor of Safety: {sum(factors)/len(factors):.2f}")
 
     def display_calculation_history(self):
@@ -165,12 +170,15 @@ class TestAnalysisSystem:
             print(f"Safety Result: {test.safety_result}")
 
 # utility funcs
-def get_valid_number(prompt: str) -> float:
+def get_valid_number(prompt: str, allow_negative: bool = False) -> float:
     while True:
         try:
             val = float(input(prompt))
-            if val <= 0:
+            if not allow_negative and val <= 0:
                 print("Error: Input must be greater than zero! Try again.\n")
+                continue
+            if allow_negative and val == 0:
+                print("Error: Change in length cannot be zero! Try again.\n")
                 continue
             return val
         except ValueError:
@@ -192,7 +200,8 @@ def main():
         force = get_valid_number(f"Enter the applied force in {UNITS[0]}: ")
         area = get_valid_number(f"Enter the cross-sectional area in {UNITS[1]}: ")
         length = get_valid_number(f"Enter the original length in {UNITS[2]}: ")
-        change = get_valid_number(f"Enter the change in length in {UNITS[3]}: ")
+        # allow_negative=True enables compression testing
+        change = get_valid_number(f"Enter the change in length in {UNITS[3]}: ", allow_negative=True)
 
         print("\nSelect Material for Safety Analysis:")
         for key, mat in materials_db.items():
@@ -220,7 +229,7 @@ def main():
         print("\n" + "-" * 15 + " Results " + "-" * 15)
         print(f"Calculated Stress: {test.stress:.2e} {UNITS[4]}")
         print(f"Calculated Strain: {test.strain:.4f}")
-        print(f"Young's Modulus: {test.youngs_modulus:.2e} {UNITS[4]}")
+        print(f"Young's Modulus: {test.youngs_modulus:.2f} GPa")
         print(f"Selected Material: {test.material.name}")
         print(f"Factor of Safety (FoS): {test.factor_of_safety:.2f}")
         print(f"Safety Status: {test.safety_result}")
