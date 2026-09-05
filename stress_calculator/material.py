@@ -14,8 +14,7 @@ class Material:
         return f"{self.name} (Density: {self.properties.density} kg/m³)"
 
     def can_withstand_stress(self, stress: float) -> bool:
-        """Check if the material can withstand the given stress."""
-        return stress < self.properties.yield_strength
+        return stress < (self.properties.yield_strength * 1_000_000)
 
 class Metal(Material):
     """A metal material subclass."""
