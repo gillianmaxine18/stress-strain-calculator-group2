@@ -252,3 +252,273 @@ def main():
 # Standard Python execution pattern
 if __name__ == "__main__":
     main()
+
+# TASK 4
+# CALCULATION FUNCTIONS
+def calculate_stress(force: float, area: float) -> float:
+    """Calculate stress based on force and area: σ = F / A."""
+    # bawal zero check
+    if area <= 0:
+        raise ValueError("Cross-sectional area must be strictly greater than zero.")
+    return force / area
+
+def calculate_strain(original_length: float, change_in_length: float) -> float:
+    """Calculate strain based on original length and change in length: ε = ΔL / L₀."""
+    if original_length <= 0:
+        raise ValueError("Original length must be strictly greater than zero.")
+    return change_in_length / original_length
+
+
+def calculate_youngs_modulus(stress: float, strain: float) -> float:
+    """Calculate Young's modulus from stress and strain: E = σ / ε."""
+    # == 0 bcos hindi negative ang strain
+    if strain == 0:
+        raise ValueError("Strain cannot be zero when calculating Young's Modulus.")
+    return stress / strain
+
+def calculate_factor_of_safety(yield_strength: float, stress: float) -> float:
+    """Calculate factor of safety: FoS = σ_yield / σ_applied."""
+    if stress <= 0:
+        raise ValueError("Applied stress must be positive to compute Factor of Safety.")
+    return yield_strength / stress
+
+# VALIDATION FUNCS
+def validate_positive_number(value: float, parameter_name: str) -> float:
+    """Validate that an input value is strictly greater than zero."""
+    if not isinstance(value, (int, float)):
+        raise TypeError(f"{parameter_name} is invalid. It must be a number.")
+    if value <= 0:
+        raise ValueError(f"{parameter_name} must be positive, got {value}.")
+    return float(value)
+
+def validate_non_zero(value: float, parameter_name: str) -> float:
+    """Ensure a denominator or change value is non-zero."""
+    if not isinstance(value, (int, float)):
+        raise TypeError(f"{parameter_name} is invalid. It must be a number.")
+    if value == 0:
+        raise ValueError(f"{parameter_name} cannot be zero.")
+    return float(value)
+
+def validate_input(force: float, area: float, original_length: float, change_in_length: float) -> bool:
+    """Validate that all input values are appropriate for calculations."""
+
+    for name, val in [
+        ("Force", force),
+        ("Area", area),
+        ("Original Length", original_length),
+        ("Change in Length", change_in_length),
+    ]:
+        if not isinstance(val, (int, float)):
+            raise TypeError(f"{name} is invalid. It must be a number.")
+
+    # validation sa logics ng each parameter
+    if area <= 0:
+        raise ValueError("Cross-sectional area must be strictly greater than zero.")
+    if original_length <= 0:
+        raise ValueError("Original length must be strictly greater than zero.")
+    if force < 0:
+        raise ValueError("Force cannot be negative.")
+
+    return True
+
+def get_validated_input(prompt: str, validator_func, param_name: str) -> float:
+    """Prompt user until valid input satisfying validator_func is provided."""
+    while True:
+        raw_val = input(prompt).strip()
+        try:
+            num = float(raw_val)
+            return validator_func(num, param_name)
+        except (ValueError, TypeError) as err:
+            print(f"  [Input Error] {err}")
+
+# DATA MANAGEMENT FUNCS
+def get_materials_database() -> dict[str, dict[str, float]]:
+    """Return default material properties database with yield strengths and Young's modulus."""
+    return {
+        "Steel": {"yield_strength": 250e6, "youngs_modulus": 200e9},
+        "Aluminum": {"yield_strength": 95e6, "youngs_modulus": 69e9},
+        "Titanium": {"yield_strength": 880e6, "youngs_modulus": 116e9},
+    }
+
+def get_material_properties(material_name: str, database: dict[str, dict[str, float]]) -> dict[str, float] | None:
+    """Retrieve material properties by name case-insensitively."""
+    for name, props in database.items():
+        if name.lower() == material_name.strip().lower():
+            return props
+    return None
+
+def create_calculation_record(material: str, inputs: dict, results: dict) -> dict:
+    """Package test data into a clean dictionary record."""
+    # dict to track na mas madali
+    return {
+        "material": material,
+        "inputs": inputs,
+        "results": results,
+    }
+
+
+def add_to_history(history_list: list, record: dict) -> None:
+    """Append a calculation record to the session history list."""
+    history_list.append(record)
+
+# DISPLAY FUNCS
+def display_material_menu(database: dict[str, dict[str, float]]) -> None:
+    """Display available predefined materials in formatted list."""
+    print("\nAvailable Materials:")
+    for mat in database:
+        print(f"  - {mat}")
+    print("  - Custom")
+
+def display_safety_analysis(stress: float, yield_strength: float, safety_factor: float) -> None:
+    """Print an engineering safety evaluation based on the Factor of Safety."""
+    print("\n--- Safety Analysis ---")
+    print(f"  Applied Stress   : {stress:,.2f} Pa")
+    print(f"  Yield Strength   : {yield_strength:,.2f} Pa")
+    print(f"  Factor of Safety : {safety_factor:.2f}")
+    if safety_factor >= 1.5:
+        print("  Status           : SAFE (Meets typical structural safety factor of 1.5+)")
+    elif safety_factor >= 1.0:
+        print("  Status           : MARGINAL (Within yield limits, but low safety margin)")
+    else:
+        print("  Status           : FAILURE / YIELDING (Applied stress exceeds yield strength)")
+
+def display_calculation_results(record: dict) -> None:
+    """Format and print complete test results."""
+    res = record["results"]
+    print("\n" + "=" * 50)
+    print(f"TEST RESULTS: {record['material']}")
+    print("-" * 50)
+    print(f"Stress           : {res['stress_Pa']:,.2f} Pa")
+    print(f"Strain           : {res['strain']:.6f}")
+    if res.get("youngs_modulus_Pa") is not None:
+        print(f"Young's Modulus  : {res['youngs_modulus_Pa']:,.2f} Pa")
+
+    if res.get("factor_of_safety") is not None and res.get("yield_strength_Pa") is not None:
+        display_safety_analysis(
+            res["stress_Pa"],
+            res["yield_strength_Pa"],
+            res["factor_of_safety"]
+        )
+    print("=" * 50)
+
+def display_session_summary(history: list[dict], unique_materials: set[str]) -> None:
+    """Print overall summary of tests performed during the session."""
+    print("\n" + "=" * 55)
+    print("SESSION SUMMARY")
+    print(f"Total Tests Recorded    : {len(history)}")
+    print(f"Unique Materials Tested : {', '.join(unique_materials) if unique_materials else 'None'}")
+    print("-" * 55)
+    for idx, item in enumerate(history, 1):
+        r = item["results"]
+        print(f"[{idx}] {item['material']} | Stress: {r['stress_Pa']:,.0f} Pa | Strain: {r['strain']:.6f}")
+    print("=" * 55)
+
+# MAIN - ORCHESTRATION
+def main_calculator(
+    material: str,
+    force: float,
+    area: float,
+    original_length: float,
+    change_in_length: float,
+    yield_strength: float | None = None
+) -> dict:
+    """Main function from template to orchestrate calculation without interactive prompts."""
+    # validation muna bago calculations
+    validate_input(force, area, original_length, change_in_length)
+
+    # run the calculations
+    stress = calculate_stress(force, area)
+    strain = calculate_strain(original_length, change_in_length)
+    youngs_modulus = calculate_youngs_modulus(stress, strain) if strain != 0 else None
+
+    fos = None
+    if yield_strength is not None and yield_strength > 0:
+        fos = calculate_factor_of_safety(yield_strength, stress)
+
+    inputs = {
+        "force_N": force,
+        "area_m2": area,
+        "original_length_m": original_length,
+        "change_in_length_m": change_in_length,
+    }
+    results = {
+        "stress_Pa": stress,
+        "strain": strain,
+        "youngs_modulus_Pa": youngs_modulus,
+        "yield_strength_Pa": yield_strength,
+        "factor_of_safety": fos,
+    }
+    return create_calculation_record(material, inputs, results)
+
+def execute_single_calculation(database: dict[str, dict[str, float]]) -> tuple[dict, str]:
+    """Coordinate user input prompts, calculation, and packaging for an interactive run."""
+    display_material_menu(database)
+    mat_choice = input("Select a material: ").strip()
+    mat_props = get_material_properties(mat_choice, database)
+
+    yield_strength = None
+    if mat_props:
+        material_name = mat_choice.capitalize()
+        yield_strength = mat_props["yield_strength"]
+    else:
+        material_name = "Custom"
+
+    force = get_validated_input("Enter force (N): ", validate_positive_number, "Force")
+    area = get_validated_input("Enter cross-sectional area (m²): ", validate_positive_number, "Area")
+    orig_l = get_validated_input("Enter original length (m): ", validate_positive_number, "Original Length")
+    delta_l = get_validated_input("Enter change in length (m): ", validate_non_zero, "Change in Length")
+
+    return main_calculator(material_name, force, area, orig_l, delta_l, yield_strength), material_name
+
+def main() -> None:
+    """Top-level program coordinator."""
+    database = get_materials_database()
+    history: list[dict] = []
+    unique_materials: set[str] = set()
+
+    print("=== Stress and Strain Analysis System (Part 4: Modular) ===")
+
+    while True:
+        record, mat_name = execute_single_calculation(database)
+        add_to_history(history, record)
+        unique_materials.add(mat_name)
+        display_calculation_results(record)
+
+        run_again = input("\nRun another calculation? (y/n): ").strip().lower()
+        if run_again != "y":
+            break
+
+    display_session_summary(history, unique_materials)
+    print("Program exited successfully.")
+
+# TESTS: cases 1, 2, and 3
+if __name__ == "__main__":
+    # Test Case 1: Modular Testing (Individual calculations)
+    assert calculate_stress(50000, 0.01) == 5000000
+    assert calculate_strain(10, 0.005) == 0.0005
+    assert calculate_youngs_modulus(5000000, 0.0005) == 10000000000
+
+    # Test Case 1b: Validation Testing
+    try:
+        validate_positive_number(-5, "force")
+        assert False, "Should have raised ValueError"
+    except ValueError:
+        pass  # Expected behavior
+
+    # Test Case 2: Integration Testing (Steel test from specs)
+    steel_test = main_calculator(
+        material="Steel",
+        force=50000,
+        area=0.01,
+        original_length=10,
+        change_in_length=0.005,
+        yield_strength=250e6
+    )
+    assert steel_test["results"]["stress_Pa"] == 5000000
+    assert steel_test["results"]["strain"] == 0.0005
+    assert steel_test["results"]["youngs_modulus_Pa"] == 10000000000
+    assert steel_test["results"]["factor_of_safety"] == 50.0
+
+    print("All unit and integration test assertions passed successfully.")
+
+    main()
