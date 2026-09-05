@@ -1,9 +1,21 @@
-# properties.py
+"""
+properties.py - Material properties data class & interactive session manager.
+"""
 
+from dataclasses import dataclass
 import sys
 from .database import load_materials, export_test_results_to_csv
 
 
+# 1. CLASS DEFINITION FOR MATERIAL PROPERTIES
+@dataclass
+class MaterialProperties:
+    density: float         # kg/m³
+    yield_strength: float  # MPa
+    youngs_modulus: float  # GPa
+
+
+# 2. INTERACTIVE SESSION MANAGER (TASK 3)
 def main():
     """Main session manager function for Task 3."""
 
@@ -128,7 +140,7 @@ def main():
         print(f"Lowest Safety Factor    : {min(foses):.2f}")
         print(f"Average Strain          : {sum(strains) / len(strains):.6f}")
 
-        # Optional Task 1 CSV Export integration
+        # Export test results to CSV
         export_test_results_to_csv(calculation_history)
 
     print("\nThank you for using the Stress and Strain Calculator!")
