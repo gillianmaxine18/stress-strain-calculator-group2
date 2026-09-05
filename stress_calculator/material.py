@@ -47,5 +47,8 @@ class Composite(Material):
     def __str__(self) -> str:
         return f"{self.name} (Composite [{self.reinforcement}], Density: {self.properties.density} kg/m³)"
 
-class Plastic(Material): pass
-class Ceramic(Material): pass
+
+class Ceramic(Material):
+    """A ceramic material subclass."""
+
+    pass

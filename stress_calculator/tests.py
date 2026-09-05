@@ -1,11 +1,24 @@
+# tests.py
 from typing import List
-from material import Material
-import utils
+from .material import Material, Metal, Plastic, Composite
+from .properties import MaterialProperties
+from .database import get_predefined_materials
+from .utils import calculate_stress, calculate_strain
+from . import utils
 
 UNITS = ("N", "m²", "m", "m", "Pa")
 
+
 class StressStrainTest:
-    def __init__(self, material: Material, force: float, area: float, original_length: float, change_in_length: float):
+
+    def __init__(
+        self,
+        material: Material,
+        force: float,
+        area: float,
+        original_length: float,
+        change_in_length: float,
+    ):
         utils.validate_input(force, area, original_length, change_in_length)
 
         self.material = material
@@ -20,7 +33,9 @@ class StressStrainTest:
 
     @property
     def strain(self) -> float:
-        return utils.calculate_strain(self._original_length, self._change_in_length)
+        return utils.calculate_strain(
+            self._original_length, self._change_in_length
+        )
 
     @property
     def youngs_modulus(self) -> float:
@@ -35,8 +50,10 @@ class StressStrainTest:
     @property
     def factor_of_safety(self) -> float:
         if self.stress <= 0:
-            return float('inf')
-        return utils.calculate_factor_of_safety(self.material.properties.yield_strength, self.stress)
+            return float("inf")
+        return utils.calculate_factor_of_safety(
+            self.material.properties.yield_strength, self.stress
+        )
 
     @property
     def safety_result(self) -> str:
@@ -52,7 +69,9 @@ class StressStrainTest:
             f"Young's Modulus={self.youngs_modulus:.2f} GPa"
         )
 
+
 class TestAnalysisSystem:
+
     def __init__(self):
         self.tests: List[StressStrainTest] = []
         self.materials_used = set()
@@ -60,6 +79,19 @@ class TestAnalysisSystem:
     def add_test(self, test: StressStrainTest):
         self.tests.append(test)
         self.materials_used.add(test.material.name)
+
+    def get_export_data(self) -> list:
+        """Helper to structure test history for database CSV export."""
+        return [
+            {
+                "material": test.material.name,
+                "stress": test.stress,
+                "strain": test.strain,
+                "factor_of_safety": test.factor_of_safety,
+                "safety_result": test.safety_result,
+            }
+            for test in self.tests
+        ]
 
     def display_session_summary(self):
         print("\n" + "=" * 45)
@@ -86,9 +118,13 @@ class TestAnalysisSystem:
         factors = [t.factor_of_safety for t in self.tests]
 
         print("\nBasic Statistics:")
-        print(f"Average Stress: {sum(stresses)/len(stresses):.2e} {UNITS[4]}")
+        print(
+            f"Average Stress: {sum(stresses)/len(stresses):.2e} {UNITS[4]}"
+        )
         print(f"Average Strain: {sum(strains)/len(strains):.4f}")
-        print(f"Average Young's Modulus: {sum(moduli)/len(moduli):.2e} {UNITS[4]}")
+        print(
+            f"Average Young's Modulus: {sum(moduli)/len(moduli):.2e} {UNITS[4]}"
+        )
         print(f"Average Factor of Safety: {sum(factors)/len(factors):.2f}")
 
     def display_calculation_history(self):
