@@ -68,3 +68,33 @@ def export_test_results_to_csv(test_data: list) -> None:
         print(f"\n[INFO] Results exported to {CSV_PATH.name}")
     except Exception as e:
         print(f"[ERROR] Export failed: {e}")
+
+HISTORY_PATH = BASE_DIR / "test_history.json"
+
+
+def save_history_to_json(test_data: list) -> None:
+    """Saves the current session's test history to a JSON file."""
+    if not test_data:
+        print("[INFO] No test history to save.")
+        return
+
+    try:
+        with open(HISTORY_PATH, "w", encoding="utf-8") as f:
+            json.dump(test_data, f, indent=4)
+        print(f"[INFO] Test history saved to {HISTORY_PATH.name}")
+    except Exception as e:
+        print(f"[ERROR] Save failed: {e}")
+
+
+def load_history_from_json() -> list:
+    """Loads previously saved test history from a JSON file. Returns [] if none exists."""
+    if not HISTORY_PATH.exists():
+        print("[INFO] No saved history file found.")
+        return []
+
+    try:
+        with open(HISTORY_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"[ERROR] Load failed: {e}")
+        return []
