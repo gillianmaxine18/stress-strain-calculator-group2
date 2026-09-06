@@ -1,55 +1,48 @@
-# Part 1: Basic Stress and Strain Calculator Template
-# TODO: Complete this template by filling in the missing code
+import sys
+from dataclasses import dataclass
+from typing import List
 
-
-def main():
-    """Main function for the stress and strain calculator."""
-
-    # TODO: Print a header for your program
+# ==========================================
+# PART 1: Basic Stress and Strain Calculator
+# ==========================================
+def main_part1():
+    """Main function for the basic stress and strain calculator."""
     print("=== Stress and Strain Calculator ===")
     print()
 
-    # TODO: Get user input for the four required values
-    # Hint: Use input() to get strings, then convert with float()
-    force = float(input("Enter applied force (N): ")) # TODO: Get applied force from user
-    area = float(input("Enter cross-sectional area (m²): ")) # TODO: Get cross-sectional area from user
-    original_length = float(input("Enter original length (m): ")) # TODO: Get original length from user
-    change_in_length = float(input("Enter change in length (m): ")) # TODO: Get change in length from user
+    # Wrap inputs in a validation loop to prevent crashes
+    while True:
+        try:
+            force = float(input("Enter applied force (N): "))
+            area = float(input("Enter cross-sectional area (m²): "))
+            original_length = float(input("Enter original length (m): "))
+            change_in_length = float(input("Enter change in length (m): "))
+            
+            # Prevent negative/zero values for physical properties, but allow negative change_in_length
+            if force <= 0 or area <= 0 or original_length <= 0:
+                print("Error: Force, area, and original length must be strictly positive.\n")
+                continue
+            break # Exit the loop if all inputs are valid
+        except ValueError:
+            print("Error: Invalid input! Please enter valid numbers.\n")
 
-    # TODO: Calculate stress and strain
-    # Hint: Stress = Force / Area, Strain = Change in Length / Original Length
-    stress = force / area # TODO: Calculate stress
-    strain = change_in_length / original_length # TODO: Calculate strain
+    stress = force / area
+    strain = change_in_length / original_length
 
-
-    # TODO: Display the input values using f-string formatting
-    print()
-    print("=== INPUT VALUES ===")
-
-    # TODO: Print each input value with appropriate formatting
-    # Hint: Use {variable:.2f} for 2 decimal places
+    print("\n=== INPUT VALUES ===")
     print(f"Force: {force:.2f} N")
     print(f"Area: {area:.4f} m²")
     print(f"Original Length: {original_length:.2f} m")
     print(f"Change in Length: {change_in_length:.4f} m")
 
-    print()
-    print("=== RESULTS ===")
-
-    # TODO: Display the calculated results
-    # TODO: Print stress with 2 decimal places and units (Pa)
+    print("\n=== RESULTS ===")
     print(f"Stress: {stress:.2f} Pa")
-
-    # TODO: Print strain with 6 decimal places (no units - it's dimensionless)
     print(f"Strain: {strain:.6f}")
-
     print()
 
-    # BONUS TODO: Convert stress to MPa (divide by 1,000,000)
     stress_mpa = stress / 1_000_000
     print(f"Stress in MPa: {stress_mpa:.2f} MPa")
 
-    # BONUS TODO: Determine if loading is tension or compression
     if change_in_length > 0:
         print("Loading Type: Tension")
     elif change_in_length < 0:
@@ -57,33 +50,22 @@ def main():
     else:
         print("Loading Type: Neutral")
 
-    print()
-    print("=== Analysis Complete ===")
+    print("\n=== Analysis Complete ===")
 
 
-
-if __name__ == "__main__":
-    main()
-    
-# Part 2: Stress and Strain Calculator with Control Structures
-# TODO: Complete this template by filling in the missing code
-
-
-def main():
+# ==========================================
+# PART 2: Control Structures
+# ==========================================
+def main_part2():
     """Main function for Task 2: Control Structures & Safety Analysis."""
-    
-    # Predefined material yield strengths (in Pa)
     STEEL_YIELD = 250_000_000      # 250 MPa
     ALUMINUM_YIELD = 95_000_000    # 95 MPa
     COPPER_YIELD = 70_000_000      # 70 MPa
 
-    # TODO: Wrap the entire calculator in a loop for repeated calculations
     while True:
         print("\n=== Stress and Strain Calculator (Task 2) ===")
         print()
 
-        # TODO: Get user inputs with exception handling (try-except) and positive-value validation
-        # Hint: Use a loop that prompts until valid input (> 0) is entered
         try:
             force = float(input("Enter applied force (N): "))
             area = float(input("Enter cross-sectional area (m^2): "))
@@ -97,11 +79,9 @@ def main():
             print("Error: Invalid numeric input! Please enter valid numbers.")
             continue
 
-        # TODO: Calculate stress and strain
         stress = force / area
         strain = change_in_length / original_length
 
-        # TODO: Material Selection (Predefined or Custom)
         print("\n=== Material Selection ===")
         print("1. Structural Steel")
         print("2. Aluminum")
@@ -133,8 +113,6 @@ def main():
             print("Invalid material choice selected.")
             continue
 
-        # TODO: Factor of Safety Calculation & Safety Analysis
-        # Hint: Factor of Safety (FOS) = Yield Strength / Calculated Stress
         fos = yield_strength / stress
 
         print("\n=== RESULTS & SAFETY ANALYSIS ===")
@@ -144,47 +122,29 @@ def main():
         print(f"Yield Strength: {yield_strength / 1_000_000:.2f} MPa")
         print(f"Factor of Safety (FOS): {fos:.2f}")
 
-        # Safety evaluation using control structures
         if fos >= 1.0:
             print("Status: SAFE — Applied stress is within material yield limits.")
         else:
             print("Status: UNSAFE — Applied stress exceeds material yield limits!")
 
-        # TODO: Repeated Calculations & Graceful Program Termination
         again = input("\nWould you like to perform another calculation? (yes/no): ").strip().lower()
         if again != 'yes' and again != 'y':
             print("\nThank you for using the calculator. Exiting gracefully...")
             break
 
 
-# TODO: Standard Python execution pattern
-if __name__ == "__main__":
-    main()
-
-
-
-# initial - task 3 
-
-import sys
-
-
-def main():
+# ==========================================
+# PART 3: Data Structures (Session Manager)
+# ==========================================
+def main_part3():
     """Main function for the stress and strain calculator with data structures."""
-
     print("=== Stress and Strain Calculator - Session Manager ===")
     print()
 
-    # TODO: Initialize empty list for calculation history
     calculation_history = []
-
-    # TODO: Initialize empty set for unique materials
     materials_used = set()
+    UNITS_P3 = ("N", "m²", "m", "Pa")
 
-    # TODO: Create tuple for measurement units (N, m², m, Pa)
-    UNITS = ("N", "m²", "m", "Pa")
-
-    # TODO: Create materials database dictionary with at least 3 materials
-    # Each material should have yield_strength and youngs_modulus (values in Pa)
     materials = {
         "1": {"name": "Structural Steel", "yield_strength": 250_000_000, "youngs_modulus": 200_000_000_000},
         "2": {"name": "Aluminum 6061-T6", "yield_strength": 276_000_000, "youngs_modulus": 68_900_000_000},
@@ -192,52 +152,42 @@ def main():
         "4": {"name": "Copper", "yield_strength": 70_000_000, "youngs_modulus": 110_000_000_000}
     }
 
-    # Main calculation loop
     while True:
-        # TODO: Display available materials
         print("\nSelect Material for Safety Analysis:")
         for key, props in materials.items():
             print(f"[{key}] {props['name']}")
         print("[Q] Quit & View Summary")
 
-        # TODO: Get material selection from user
         mat_choice = input("Enter choice (1-4 or Q to Quit): ").strip()
 
-        # TODO: Check if user wants to quit
         if mat_choice.lower() in ["q", "quit"]:
             break
 
-        # TODO: Validate material exists in database
         if mat_choice not in materials:
             print("Error: Material not found in database! Please select a valid option.\n")
             continue
 
         try:
-            # TODO: Get input values (force, area, original_length, change_in_length)
-            applied_force = float(input(f"Enter applied force ({UNITS[0]}): "))
-            cross_sectional_area = float(input(f"Enter cross-sectional area ({UNITS[1]}): "))
-            original_length = float(input(f"Enter original length ({UNITS[2]}): "))
-            change_in_length = float(input(f"Enter change in length ({UNITS[2]}): "))
+            applied_force = float(input(f"Enter applied force ({UNITS_P3[0]}): "))
+            cross_sectional_area = float(input(f"Enter cross-sectional area ({UNITS_P3[1]}): "))
+            original_length = float(input(f"Enter original length ({UNITS_P3[2]}): "))
+            change_in_length = float(input(f"Enter change in length ({UNITS_P3[2]}): "))
 
-            # TODO: Validate inputs (positive values, non-zero where needed)
-            if applied_force <= 0 or cross_sectional_area <= 0 or original_length <= 0 or change_in_length <= 0:
-                print("Error: Inputs must be positive numbers greater than zero!\n")
+            # Removed change_in_length from strictly positive requirement to allow compression
+            if applied_force <= 0 or cross_sectional_area <= 0 or original_length <= 0:
+                print("Error: Force, area, and original length must be positive numbers greater than zero!\n")
                 continue
 
-            # TODO: Calculate stress and strain
             stress = applied_force / cross_sectional_area
             strain = change_in_length / original_length
 
-            # TODO: Get material properties from database
             selected_mat = materials[mat_choice]
             mat_name = selected_mat["name"]
             yield_strength = selected_mat["yield_strength"]
 
-            # TODO: Calculate safety factor
             fos = yield_strength / stress
             safety_result = "SAFE" if fos >= 1.0 else "WARNING - MATERIAL WILL FAIL"
 
-            # TODO: Create calculation record dictionary with all data
             record = {
                 "material": mat_name,
                 "force": applied_force,
@@ -250,15 +200,11 @@ def main():
                 "status": safety_result
             }
 
-            # TODO: Add record to history list
             calculation_history.append(record)
-
-            # TODO: Add material to unique materials set
             materials_used.add(mat_name)
 
-            # TODO: Display results for this calculation
             print("\n" + "-" * 15 + " Results " + "-" * 15)
-            print(f"Calculated Stress       : {stress:,.2f} {UNITS[3]}")
+            print(f"Calculated Stress       : {stress:,.2f} {UNITS_P3[3]}")
             print(f"Calculated Strain       : {strain:.6f}")
             print(f"Selected Material       : {mat_name}")
             print(f"Factor of Safety (FoS)  : {fos:.2f}")
@@ -273,13 +219,7 @@ def main():
             print("Error: Invalid input. Please enter numeric values.")
         except ZeroDivisionError:
             print("Error: Area and original length cannot be zero!")
-        except KeyError:
-            print("Error: Material not found in database!")
 
-    # TODO: Display session summary
-    # - Total number of calculations
-    # - List of unique materials tested
-    # - Detailed history of each calculation
     print("\n" + "=" * 45)
     print("              SESSION SUMMARY")
     print("=" * 45)
@@ -296,61 +236,44 @@ def main():
     if calculation_history:
         print("\nDetailed History:")
         for idx, r in enumerate(calculation_history, start=1):
-            print(f"  [{idx}] Material: {r['material']} | Stress: {r['stress']:,.2f} {UNITS[3]} | FoS: {r['factor_of_safety']:.2f} ({r['status']})")
+            print(f"  [{idx}] Material: {r['material']} | Stress: {r['stress']:,.2f} {UNITS_P3[3]} | FoS: {r['factor_of_safety']:.2f} ({r['status']})")
 
-        # TODO: Display statistics (optional)
-        # - Highest stress
-        # - Lowest safety factor
-        # - Average strain
-        # - Material test counts
         stresses = [r["stress"] for r in calculation_history]
         foses = [r["factor_of_safety"] for r in calculation_history]
         strains = [r["strain"] for r in calculation_history]
 
         print("\n=== Session Statistics ===")
-        print(f"Highest Stress Observed : {max(stresses):,.2f} {UNITS[3]}")
+        print(f"Highest Stress Observed : {max(stresses):,.2f} {UNITS_P3[3]}")
         print(f"Lowest Safety Factor    : {min(foses):.2f}")
         print(f"Average Strain          : {sum(strains) / len(strains):.6f}")
 
     print("\nThank you for using the Stress and Strain Calculator!")
 
 
-# Standard Python execution pattern
-if __name__ == "__main__":
-    main()
-
-# TASK 4
-# CALCULATION FUNCTIONS
+# ==========================================
+# PART 4: Calculation Functions
+# ==========================================
 def calculate_stress(force: float, area: float) -> float:
-    """Calculate stress based on force and area: σ = F / A."""
-    # bawal zero check
     if area <= 0:
         raise ValueError("Cross-sectional area must be strictly greater than zero.")
     return force / area
 
 def calculate_strain(original_length: float, change_in_length: float) -> float:
-    """Calculate strain based on original length and change in length: ε = ΔL / L₀."""
     if original_length <= 0:
         raise ValueError("Original length must be strictly greater than zero.")
     return change_in_length / original_length
 
-
 def calculate_youngs_modulus(stress: float, strain: float) -> float:
-    """Calculate Young's modulus from stress and strain: E = σ / ε."""
-    # == 0 bcos hindi negative ang strain
     if strain == 0:
         raise ValueError("Strain cannot be zero when calculating Young's Modulus.")
     return stress / strain
 
 def calculate_factor_of_safety(yield_strength: float, stress: float) -> float:
-    """Calculate factor of safety: FoS = σ_yield / σ_applied."""
     if stress <= 0:
         raise ValueError("Applied stress must be positive to compute Factor of Safety.")
     return yield_strength / stress
 
-# VALIDATION FUNCS
 def validate_positive_number(value: float, parameter_name: str) -> float:
-    """Validate that an input value is strictly greater than zero."""
     if not isinstance(value, (int, float)):
         raise TypeError(f"{parameter_name} is invalid. It must be a number.")
     if value <= 0:
@@ -358,7 +281,6 @@ def validate_positive_number(value: float, parameter_name: str) -> float:
     return float(value)
 
 def validate_non_zero(value: float, parameter_name: str) -> float:
-    """Ensure a denominator or change value is non-zero."""
     if not isinstance(value, (int, float)):
         raise TypeError(f"{parameter_name} is invalid. It must be a number.")
     if value == 0:
@@ -366,8 +288,6 @@ def validate_non_zero(value: float, parameter_name: str) -> float:
     return float(value)
 
 def validate_input(force: float, area: float, original_length: float, change_in_length: float) -> bool:
-    """Validate that all input values are appropriate for calculations."""
-
     for name, val in [
         ("Force", force),
         ("Area", area),
@@ -377,7 +297,6 @@ def validate_input(force: float, area: float, original_length: float, change_in_
         if not isinstance(val, (int, float)):
             raise TypeError(f"{name} is invalid. It must be a number.")
 
-    # validation sa logics ng each parameter
     if area <= 0:
         raise ValueError("Cross-sectional area must be strictly greater than zero.")
     if original_length <= 0:
@@ -388,7 +307,6 @@ def validate_input(force: float, area: float, original_length: float, change_in_
     return True
 
 def get_validated_input(prompt: str, validator_func, param_name: str) -> float:
-    """Prompt user until valid input satisfying validator_func is provided."""
     while True:
         raw_val = input(prompt).strip()
         try:
@@ -397,9 +315,7 @@ def get_validated_input(prompt: str, validator_func, param_name: str) -> float:
         except (ValueError, TypeError) as err:
             print(f"  [Input Error] {err}")
 
-# DATA MANAGEMENT FUNCS
 def get_materials_database() -> dict[str, dict[str, float]]:
-    """Return default material properties database with yield strengths and Young's modulus."""
     return {
         "Steel": {"yield_strength": 250e6, "youngs_modulus": 200e9},
         "Aluminum": {"yield_strength": 95e6, "youngs_modulus": 69e9},
@@ -407,36 +323,28 @@ def get_materials_database() -> dict[str, dict[str, float]]:
     }
 
 def get_material_properties(material_name: str, database: dict[str, dict[str, float]]) -> dict[str, float] | None:
-    """Retrieve material properties by name case-insensitively."""
     for name, props in database.items():
         if name.lower() == material_name.strip().lower():
             return props
     return None
 
 def create_calculation_record(material: str, inputs: dict, results: dict) -> dict:
-    """Package test data into a clean dictionary record."""
-    # dict to track na mas madali
     return {
         "material": material,
         "inputs": inputs,
         "results": results,
     }
 
-
 def add_to_history(history_list: list, record: dict) -> None:
-    """Append a calculation record to the session history list."""
     history_list.append(record)
 
-# DISPLAY FUNCS
 def display_material_menu(database: dict[str, dict[str, float]]) -> None:
-    """Display available predefined materials in formatted list."""
     print("\nAvailable Materials:")
     for mat in database:
         print(f"  - {mat}")
     print("  - Custom")
 
 def display_safety_analysis(stress: float, yield_strength: float, safety_factor: float) -> None:
-    """Print an engineering safety evaluation based on the Factor of Safety."""
     print("\n--- Safety Analysis ---")
     print(f"  Applied Stress   : {stress:,.2f} Pa")
     print(f"  Yield Strength   : {yield_strength:,.2f} Pa")
@@ -449,7 +357,6 @@ def display_safety_analysis(stress: float, yield_strength: float, safety_factor:
         print("  Status           : FAILURE / YIELDING (Applied stress exceeds yield strength)")
 
 def display_calculation_results(record: dict) -> None:
-    """Format and print complete test results."""
     res = record["results"]
     print("\n" + "=" * 50)
     print(f"TEST RESULTS: {record['material']}")
@@ -468,7 +375,6 @@ def display_calculation_results(record: dict) -> None:
     print("=" * 50)
 
 def display_session_summary(history: list[dict], unique_materials: set[str]) -> None:
-    """Print overall summary of tests performed during the session."""
     print("\n" + "=" * 55)
     print("SESSION SUMMARY")
     print(f"Total Tests Recorded    : {len(history)}")
@@ -479,7 +385,6 @@ def display_session_summary(history: list[dict], unique_materials: set[str]) -> 
         print(f"[{idx}] {item['material']} | Stress: {r['stress_Pa']:,.0f} Pa | Strain: {r['strain']:.6f}")
     print("=" * 55)
 
-# MAIN - ORCHESTRATION
 def main_calculator(
     material: str,
     force: float,
@@ -488,11 +393,7 @@ def main_calculator(
     change_in_length: float,
     yield_strength: float | None = None
 ) -> dict:
-    """Main function from template to orchestrate calculation without interactive prompts."""
-    # validation muna bago calculations
     validate_input(force, area, original_length, change_in_length)
-
-    # run the calculations
     stress = calculate_stress(force, area)
     strain = calculate_strain(original_length, change_in_length)
     youngs_modulus = calculate_youngs_modulus(stress, strain) if strain != 0 else None
@@ -517,7 +418,6 @@ def main_calculator(
     return create_calculation_record(material, inputs, results)
 
 def execute_single_calculation(database: dict[str, dict[str, float]]) -> tuple[dict, str]:
-    """Coordinate user input prompts, calculation, and packaging for an interactive run."""
     display_material_menu(database)
     mat_choice = input("Select a material: ").strip()
     mat_props = get_material_properties(mat_choice, database)
@@ -536,8 +436,29 @@ def execute_single_calculation(database: dict[str, dict[str, float]]) -> tuple[d
 
     return main_calculator(material_name, force, area, orig_l, delta_l, yield_strength), material_name
 
-def main() -> None:
-    """Top-level program coordinator."""
+def main_part4() -> None:
+    """Top-level program coordinator for Part 4."""
+    # Test Cases run silently before initialization to verify logic
+    assert calculate_stress(50000, 0.01) == 5000000
+    assert calculate_strain(10, 0.005) == 0.0005
+    assert calculate_youngs_modulus(5000000, 0.0005) == 10000000000
+
+    try:
+        validate_positive_number(-5, "force")
+        assert False, "Should have raised ValueError"
+    except ValueError:
+        pass  # Expected behavior
+
+    steel_test = main_calculator(
+        material="Steel", force=50000, area=0.01, original_length=10,
+        change_in_length=0.005, yield_strength=250e6
+    )
+    assert steel_test["results"]["stress_Pa"] == 5000000
+    assert steel_test["results"]["strain"] == 0.0005
+    assert steel_test["results"]["youngs_modulus_Pa"] == 10000000000
+    assert steel_test["results"]["factor_of_safety"] == 50.0
+    print("[INFO] All modular tests passed successfully.\n")
+
     database = get_materials_database()
     history: list[dict] = []
     unique_materials: set[str] = set()
@@ -557,47 +478,12 @@ def main() -> None:
     display_session_summary(history, unique_materials)
     print("Program exited successfully.")
 
-# TESTS: cases 1, 2, and 3
-if __name__ == "__main__":
-    # Test Case 1: Modular Testing (Individual calculations)
-    assert calculate_stress(50000, 0.01) == 5000000
-    assert calculate_strain(10, 0.005) == 0.0005
-    assert calculate_youngs_modulus(5000000, 0.0005) == 10000000000
 
-    # Test Case 1b: Validation Testing
-    try:
-        validate_positive_number(-5, "force")
-        assert False, "Should have raised ValueError"
-    except ValueError:
-        pass  # Expected behavior
+# ==========================================
+# PART 5: OOP Models
+# ==========================================
+UNITS_P5 = ("N", "m²", "m", "m", "Pa")
 
-    # Test Case 2: Integration Testing (Steel test from specs)
-    steel_test = main_calculator(
-        material="Steel",
-        force=50000,
-        area=0.01,
-        original_length=10,
-        change_in_length=0.005,
-        yield_strength=250e6
-    )
-    assert steel_test["results"]["stress_Pa"] == 5000000
-    assert steel_test["results"]["strain"] == 0.0005
-    assert steel_test["results"]["youngs_modulus_Pa"] == 10000000000
-    assert steel_test["results"]["factor_of_safety"] == 50.0
-
-    print("All unit and integration test assertions passed successfully.")
-
-    main()
-
-#Part 5: OOP Models
-import sys
-from dataclasses import dataclass
-from typing import List
-
-# constants
-UNITS = ("N", "m²", "m", "m", "Pa")
-
-# OOP models
 @dataclass
 class MaterialProperties:
     density: float  # kg/m³
@@ -621,7 +507,7 @@ class Material:
         return f"{self.name} (Density: {self.properties.density} kg/m³)"
 
     def can_withstand_stress(self, stress: float) -> bool:
-        return stress < self.properties.yield_strength
+        return stress < (self.properties.yield_strength * 1_000_000)
 
 class Metal(Material):
     def __init__(self, name: str, properties: MaterialProperties, is_ferrous: bool = False):
@@ -635,7 +521,6 @@ class Metal(Material):
 class Plastic(Material): pass
 class Ceramic(Material): pass
 
-# database integration
 def get_predefined_materials() -> dict:
     return {
         "1": Metal("Structural Steel", MaterialProperties(7850, 250, 200), is_ferrous=True),
@@ -644,7 +529,6 @@ def get_predefined_materials() -> dict:
         "4": Ceramic("Standard Concrete", MaterialProperties(2400, 30, 30))
     }
 
-# core stress strain calculations
 class StressStrainTest:
     def __init__(self, material: Material, force: float, area: float, original_length: float, change_in_length: float):
         self.material = material
@@ -659,6 +543,8 @@ class StressStrainTest:
             raise ValueError("Area must be positive")
         if original_length <= 0:
             raise ValueError("Original length must be positive")
+        if change_in_length == 0:
+            raise ValueError("Change in length cannot be zero")
 
     @property
     def stress(self) -> float:
@@ -672,7 +558,7 @@ class StressStrainTest:
     def youngs_modulus(self) -> float:
         if self.strain == 0:
             return 0
-        return (self.stress / self.strain) / 1000
+        return (self.stress / self.strain) / 1e9
 
     def will_fail(self) -> bool:
         return not self.material.can_withstand_stress(self.stress)
@@ -681,7 +567,7 @@ class StressStrainTest:
     def factor_of_safety(self) -> float:
         if self.stress <= 0:
             return float('inf')
-        return self.material.properties.yield_strength / self.stress
+        return (self.material.properties.yield_strength * 1_000_000) / self.stress
 
     @property
     def safety_result(self) -> str:
@@ -692,12 +578,11 @@ class StressStrainTest:
     def __str__(self) -> str:
         return (
             f"Test on {self.material.name}: "
-            f"Stress={self.stress:.2f} MPa, "
+            f"Stress={self.stress:.2f} Pa, "
             f"Strain={self.strain:.6f}, "
             f"Young's Modulus={self.youngs_modulus:.2f} GPa"
         )
 
-# test analysis and session history
 class TestAnalysisSystem:
     def __init__(self):
         self.tests: List[StressStrainTest] = []
@@ -732,9 +617,9 @@ class TestAnalysisSystem:
         factors = [t.factor_of_safety for t in self.tests]
 
         print("\nBasic Statistics:")
-        print(f"Average Stress: {sum(stresses)/len(stresses):.2e} {UNITS[4]}")
+        print(f"Average Stress: {sum(stresses)/len(stresses):.2e} {UNITS_P5[4]}")
         print(f"Average Strain: {sum(strains)/len(strains):.4f}")
-        print(f"Average Young's Modulus: {sum(moduli)/len(moduli):.2e} {UNITS[4]}")
+        print(f"Average Young's Modulus: {sum(moduli)/len(moduli):.2e} GPa")
         print(f"Average Factor of Safety: {sum(factors)/len(factors):.2f}")
 
     def display_calculation_history(self):
@@ -749,21 +634,28 @@ class TestAnalysisSystem:
             print(f"\nTest {i}")
             print("-" * 30)
             print(f"Material: {test.material.name}")
-            print(f"Force: {test.applied_force:.2f} {UNITS[0]}")
-            print(f"Area: {test.area:.6f} {UNITS[1]}")
-            print(f"Stress: {test.stress:.2e} {UNITS[4]}")
+            print(f"Force: {test._force:.2f} {UNITS_P5[0]}")
+            print(f"Area: {test._area:.6f} {UNITS_P5[1]}")
+            print(f"Stress: {test.stress:.2e} {UNITS_P5[4]}")
             print(f"Strain: {test.strain:.4f}")
             print(f"Factor of Safety: {test.factor_of_safety:.2f}")
             print(f"Safety Result: {test.safety_result}")
 
-# utility funcs
-def get_valid_number(prompt: str) -> float:
+def get_valid_number(prompt: str, allow_negative: bool = False) -> float:
     while True:
         try:
             val = float(input(prompt))
-            if val <= 0:
+            
+            # If negatives are not allowed, block <= 0
+            if not allow_negative and val <= 0:
                 print("Error: Input must be greater than zero! Try again.\n")
                 continue
+            
+            # If negatives are allowed (for compression), just block exactly 0
+            if allow_negative and val == 0:
+                print("Error: Change in length cannot be exactly zero! Try again.\n")
+                continue
+                
             return val
         except ValueError:
             print("Invalid input! Please enter a valid number.\n")
@@ -771,20 +663,22 @@ def get_valid_number(prompt: str) -> float:
             print("\nProgram stopped. Goodbye!")
             sys.exit()
 
-# main calc
-def main():
+def main_part5():
+    """Main execution function for Part 5 (OOP Models)"""
     analyzer = TestAnalysisSystem()
     materials_db = get_predefined_materials()
 
     while True:
         print("\n" + "=" * 45)
-        print("       STRESS AND STRAIN CALCULATOR")
+        print("       STRESS AND STRAIN CALCULATOR (OOP)")
         print("=" * 45)
 
-        force = get_valid_number(f"Enter the applied force in {UNITS[0]}: ")
-        area = get_valid_number(f"Enter the cross-sectional area in {UNITS[1]}: ")
-        length = get_valid_number(f"Enter the original length in {UNITS[2]}: ")
-        change = get_valid_number(f"Enter the change in length in {UNITS[3]}: ")
+        force = get_valid_number(f"Enter the applied force in {UNITS_P5[0]}: ")
+        area = get_valid_number(f"Enter the cross-sectional area in {UNITS_P5[1]}: ")
+        length = get_valid_number(f"Enter the original length in {UNITS_P5[2]}: ")
+        
+        # Set allow_negative to True so compression tests can be performed
+        change = get_valid_number(f"Enter the change in length in {UNITS_P5[3]}: ", allow_negative=True)
 
         print("\nSelect Material for Safety Analysis:")
         for key, mat in materials_db.items():
@@ -805,14 +699,13 @@ def main():
             print("Invalid choice! Defaulting to Structural Steel.")
             selected_material = materials_db["1"]
 
-        # Process through OOP system
         test = StressStrainTest(selected_material, force, area, length, change)
         analyzer.add_test(test)
 
         print("\n" + "-" * 15 + " Results " + "-" * 15)
-        print(f"Calculated Stress: {test.stress:.2e} {UNITS[4]}")
+        print(f"Calculated Stress: {test.stress:.2e} {UNITS_P5[4]}")
         print(f"Calculated Strain: {test.strain:.4f}")
-        print(f"Young's Modulus: {test.youngs_modulus:.2e} {UNITS[4]}")
+        print(f"Young's Modulus: {test.youngs_modulus:.2f} GPa")
         print(f"Selected Material: {test.material.name}")
         print(f"Factor of Safety (FoS): {test.factor_of_safety:.2f}")
         print(f"Safety Status: {test.safety_result}")
@@ -822,10 +715,41 @@ def main():
         if repeat not in ["yes", "y"]:
             break
 
-    # Display final summaries
     analyzer.display_calculation_history()
     analyzer.display_session_summary()
     print("\nThank you for using the Stress and Strain Calculator! Goodbye!")
 
+
+# ==========================================
+# MASTER PROGRAM COORDINATOR
+# ==========================================
 if __name__ == "__main__":
-    main()
+    while True:
+        print("\n" + "=" * 50)
+        print("  STRESS & STRAIN CALCULATOR - MASTER MENU")
+        print("=" * 50)
+        print("1. Run Part 1: Basic Calculator")
+        print("2. Run Part 2: Control Structures")
+        print("3. Run Part 3: Data Structures (Session Manager)")
+        print("4. Run Part 4: Modular Functions")
+        print("5. Run Part 5: OOP Models")
+        print("Q. Quit")
+        print("=" * 50)
+        
+        menu_choice = input("Select a programme to run (1-5 or Q): ").strip().upper()
+        
+        if menu_choice == '1':
+            main_part1()
+        elif menu_choice == '2':
+            main_part2()
+        elif menu_choice == '3':
+            main_part3()
+        elif menu_choice == '4':
+            main_part4()
+        elif menu_choice == '5':
+            main_part5()
+        elif menu_choice == 'Q':
+            print("Exiting Master Program. Goodbye!")
+            sys.exit()
+        else:
+            print("Invalid selection. Please enter a number between 1 and 5, or 'Q' to quit.")

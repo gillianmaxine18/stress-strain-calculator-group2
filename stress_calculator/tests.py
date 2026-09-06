@@ -42,18 +42,16 @@ class StressStrainTest:
         if self.strain == 0:
             return 0
         raw_modulus = utils.calculate_youngs_modulus(self.stress, self.strain)
-        return raw_modulus / 1000
+        return raw_modulus / 1e9
 
     def will_fail(self) -> bool:
         return not self.material.can_withstand_stress(self.stress)
-
+    
     @property
     def factor_of_safety(self) -> float:
         if self.stress <= 0:
             return float("inf")
-        return utils.calculate_factor_of_safety(
-            self.material.properties.yield_strength, self.stress
-        )
+        return utils.calculate_factor_of_safety(self.material.properties.yield_strength * 1_000_000, self.stress)
 
     @property
     def safety_result(self) -> str:
@@ -64,7 +62,7 @@ class StressStrainTest:
     def __str__(self) -> str:
         return (
             f"Test on {self.material.name}: "
-            f"Stress={self.stress:.2f} MPa, "
+            f"Stress={self.stress / 1_000_000:.2f} MPa, "
             f"Strain={self.strain:.6f}, "
             f"Young's Modulus={self.youngs_modulus:.2f} GPa"
         )
