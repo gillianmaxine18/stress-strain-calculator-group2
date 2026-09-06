@@ -5,6 +5,8 @@ Part of Task 6 Modular Package Integration
 
 import math
 
+UNITS = ("N", "m²", "m", "Pa")
+
 # 1. CORE CALCULATION UTILITIES
 def calculate_stress(force: float, area: float) -> float:
     """Calculate normal stress: σ = F / A."""

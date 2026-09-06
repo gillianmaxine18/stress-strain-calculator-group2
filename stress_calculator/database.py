@@ -9,7 +9,6 @@ import json
 import csv
 from pathlib import Path
 from datetime import datetime
-from .properties import MaterialProperties
 from .material import Material, Metal, Plastic, Composite
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -18,6 +17,7 @@ CSV_PATH = BASE_DIR / "test_results.csv"
 
 def get_predefined_materials() -> dict:
     """Default fallback materials."""
+    from .properties import MaterialProperties  # <--- MUST BE HERE TOO
     return {
         "1": Metal("Structural Steel", MaterialProperties(7850, 250, 200), is_ferrous=True),
         "2": Metal("Aluminum 6061", MaterialProperties(2700, 276, 68.9), is_ferrous=False),
@@ -25,8 +25,9 @@ def get_predefined_materials() -> dict:
         "4": Composite("Carbon Fiber", MaterialProperties(1600, 600, 150)),
     }
 
-def load_materials() -> dict:
+def load_materials():
     """Loads material database (JSON fallback to default dict)."""
+    from .properties import MaterialProperties
     if not JSON_PATH.exists():
         return get_predefined_materials()
 
