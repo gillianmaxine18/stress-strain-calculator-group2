@@ -1,13 +1,14 @@
 # Stress and Strain Analysis System
 
 ## Group Members
+
 | Member | Primary Responsibility | GitHub Username | Task 6 Contribution |
-| :--- | :--- | :--- | :--- |
-| Hans Adrian Laudato | Task 1 – Basic Calculations | @hansadrianlaudato | Tested calculation modules |
-| Gillian Maxine Estilloso | Task 2 – Control Structures  | @gillianmaxine18 | Integrated validation |
-| Giana Elisha Tuplano | Task 3 – Data Structures | @gianaelishatuplano-jpg | Implemented CSV export |
-| Kaycelyn Tigas | Task 4 – Functions| @kaycelyntigas | Refactored utility functions |
-| Kate Robyn Alday | Task 5 – OOP | @katerobynalday | Integrated class architecture |
+|---|---|---|---|
+| Hans Adrian Laudato | Task 1 – Basic Calculations | @hansadrianlaudato | Developed the `database.py` module, which manages predefined materials and file export functions. |
+| Gillian Maxine Estilloso | Task 2 – Control Structures | @gillianmaxine18 | Developed the `material.py` module, which contains the Material class hierarchy. |
+| Giana Elisha Tuplano | Task 3 – Data Structures | @gianaelishatuplano-jpg | Developed the `properties.py` module, which defines the material properties dataclass. |
+| Kaycelyn Tigas | Task 4 – Functions | @kaycelyntigas | Developed the `utils.py` module, which contains the reusable calculation and validation functions. |
+| Kate Robyn Alday | Task 5 – OOP | @katerobynalday | Developed the `tests.py` module, which contains the stress-strain test and analysis system classes. |
 
 *Note: Task 6 – Modular Integration was completed collaboratively by all members.*
 
